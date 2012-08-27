@@ -1,0 +1,101 @@
+
+<html><head>
+<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3&amp;sensor=false"></script>
+<script type="text/javascript" scr="javascript?jquery"></script>
+
+<script>
+function aisMapInit() {
+
+// ----- define the map projections
+projLonlat   = new OpenLayers.Projection("EPSG:4326");
+projMercator = new OpenLayers.Projection("EPSG:900913");
+
+// ----- define some map properties
+centerLonlat = new OpenLayers.LonLat(4.13, 51.97).transform(projLonlat, projMercator);
+baseLonlat   = new OpenLayers.LonLat(4.3977654, 52.0093721).transform(projLonlat, projMercator);
+basePoint    = new OpenLayers.Geometry.Point(baseLonlat.lon, baseLonlat.lat);
+baseCircle   = OpenLayers.Geometry.Polygon.createRegularPolygon(basePoint, 65000, 180, 0);          
+zoom = 11;
+
+// ----- define a url for fetching kml strings
+kmlUrl = "http://localhost:3000/ais.active.kml";
+
+// ----- create a layer for displaying the ais base station and its range
+stationLayer    = new OpenLayers.Layer.Vector("Ais Base Station");
+stationCircle   = new OpenLayers.Feature.Vector(baseCircle, {}, {fill: false, 
+                                                      strokeDashstyle: "dot"});
+stationPoint    = new OpenLayers.Feature.Vector(basePoint, {}, {externalGraphic: "http://www.openlayers.org/dev/img/marker.png", 
+                                                                   graphicWidth: 20, 
+                                                                  graphicHeight: 20,
+                                                                   graphicTitle: "Ais Base Station Delfgauw"});
+stationLayer.addFeatures([stationPoint, stationCircle]);
+
+// ----- create the map with a number of controls and a scale
+map = new OpenLayers.Map("mapdiv", {    
+    theme: null,
+    numZoomLevels: 16,
+       units: 'meters',
+    controls: [ new OpenLayers.Control.OverviewMap(),
+                new OpenLayers.Control.Attribution(),
+                new OpenLayers.Control.PanZoomBar(),
+                new OpenLayers.Control.Attribution(),
+                new OpenLayers.Control.Navigation(),
+                new OpenLayers.Control.LayerSwitcher(),
+                new OpenLayers.Control.MousePosition(), 
+                new OpenLayers.Control.ScaleLine({   topOutUnits : "nmi", 
+                                                   bottomOutUnits: "km", 
+                                                       topInUnits: 'nmi', 
+                                                    bottomInUnits: 'km', 
+                                                         maxWidth: '40'  }),
+              ] });     
+
+// ----- create a vector layer for displaying the active vessels as kml from http
+actVesselsKml = new OpenLayers.Layer.Vector("Active Vessels KML", {
+		projection: new OpenLayers.Projection(projLonlat),
+		strategies: [
+			new OpenLayers.Strategy.BBOX(),
+			new OpenLayers.Strategy.Cluster()
+		],
+		protocol: new OpenLayers.Protocol.HTTP({
+                           url: kmlUrl,  
+			format: new OpenLayers.Format.KML({
+                                extractStyles: true, 
+                                extractAttributes: true
+                        }),
+		}),
+	    });
+
+// ----- create a number of base layers for different, alternative maps
+layerOSM = new OpenLayers.Layer.OSM("Open Street Map");
+layerGop = new OpenLayers.Layer.Google("Google Physical", {type: google.maps.MapTypeId.TERRAIN});
+layerGos = new OpenLayers.Layer.Google("Google Streets", {numZoomLevels: 20});
+layerGoh = new OpenLayers.Layer.Google("Google Hybrid", {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20});
+layerGsa = new OpenLayers.Layer.Google("Google Satellite", {type:google.maps.MapTypeId.SATELLITE, numZoomLevels: 22});
+
+// ----- add the various layers to the basic map
+map.addLayers([layerOSM, layerGop, layerGos, layerGoh, layerGsa, stationLayer, actVesselsKml]);
+
+// finally, center the map around the port of Rotterdam
+map.setCenter(centerLonlat, zoom);
+
+// ----- set the kml vessel layer to be reloaed from http every second
+window.setInterval(UpdateKmlLayer, 1000, actVesselsKml);
+}
+
+function UpdateKmlLayer(layer) {
+    // this is the update function called every second by window.setInterval()
+    layer.loaded = false;
+    layer.setVisibility(true);
+    layer.refresh({ force: true, params: { 'key': Math.random()} });
+}
+
+</script>
+</head><html>
+
+<body onload="aisMapInit();">
+    <div id="mapdiv"></div>
+    <script>
+    </script>
+</body>    
+
