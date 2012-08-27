@@ -6,6 +6,7 @@
 
 require 'rubygems'
 require 'redis'
+require 'thread'
 $LOAD_PATH << './lib'
 require 'aisDomainFactories.rb'
 
