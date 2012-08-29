@@ -1,0 +1,4 @@
+redis-cli
+redis-server
+dump.rdb
+vendor/
