@@ -21,6 +21,7 @@ loop {
     activeVessels.each do |v|
       ais, act, mmsi = v.split('.')
       statusStr = redis.get("ais.status.#{mmsi}")
+      next if statusStr.nil?
       key, mmsi, ts, lat, lon, right = statusStr.split(',')
       kml.puts("<Placemark>")
       kml.puts("    <name>#{mmsi}</name>")

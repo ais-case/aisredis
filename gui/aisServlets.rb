@@ -175,6 +175,7 @@ module AisServlets
       mmsi = k.delete("ais.active.")
       activeString = $redis.get("ais.status.#{mmsi}")
       # "ais.status,244750217,1342016369.990824938,51.91542,4.48328333333333,2278.0,511.0,0.0,15"
+      next if activeString.nil?
       substr = activeString.split(',')
       lon = substr[4].to_f
       lat = substr[3].to_f
