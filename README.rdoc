@@ -1,0 +1,96 @@
+= Getting started
+
+The main dependencies are Ruby 1.9.x, the ZeroMQ library and the bundler gem. Once the bundler gem
+is installed, bundler can be used to install the remaining dependencies using
+the Gemfile in the root directory of the project. You may want to install and
+use a RVM gemset. This keeps to the installed gems separated from other gems
+on your system to prevent any version conflicts.
+
+== Quickstart lab machines
+
+1. Clone the repository:
+    
+    $ git clone git://github.com/ais-case/aisredis.git
+
+2. Run the installer:
+
+    $ aisredis/installer.sh
+
+3. Now in a new terminal window, go to the ais directory.
+
+   When asked: <tt>Do you wish to trust this .rvmrc file?</tt>,answer with 
+   <tt>yes</tt>, <tt><ENTER></tt> 
+ 
+You can now jump straight to "Running the system" to start the services
+
+== Installation
+
+=== Optional: setting up an environment with RVM
+
+RVM allows you to install and run the project without conflicts with other Ruby-based
+projects you might have installed. Instructions for the installation can be found at 
+the {RVM website}[https://rvm.io/rvm/install/]. A quick overview of RVM installation 
+and setup for this project:
+
+1. Download and install RVM:
+ 
+    $ curl -L get.rvm.io | bash -s stable
+    
+2. Load RVM into current session:
+
+    $ source ~/.rvm/scripts/rvm
+    
+3. Download and install Ruby 1.8:
+
+    $ rvm install 1.8.7
+
+4. Indicate you want to use Ruby 1.8.7:
+
+    $ rvm use 1.8.7
+
+5. Create a separated gemset for this project:
+
+    $ rvm gemset create aisredis
+    
+6. Switch to the newly created environment: 
+
+    $ rvm use "1.8.7@aisredis"
+
+Before you work with the project you will always have to switch to this gemset. This
+can be automated by updating <tt>environment_id</tt> in a <tt>.rvmrc</tt> file of the project with the 
+information about your environment. An example file is included as <tt>.rvmrc.distrib</tt>
+
+=== Installing dependencies
+
+The Ruby dependencies of the project are documented in the Gemfile. To install all 
+dependencies, use the bundler gem:
+
+1. Install bundler:
+
+    $ gem install bundler
+    
+2. Then from inside the project directory run bundler to download and install all dependencies:
+
+    $ bundle install
+
+In addition to these Ruby Gems you will also need to install the ZeroMQ library available 
+from http://www.zeromq.org.
+
+== Running the system
+
+The system consists of a redis server process and a number of separate ruby processes. 
+
+First, start the redis server from the project root directory:
+
+    $ ./redis-server
+
+Then, start each of the other <tt>ais*.rb</tt>-files in separate terminal windows (or tabs):
+
+    $ ruby aisWebserver.rb
+    $ ruby aisKmlServer.rb
+    $ ruby aisActive.rb
+    $ ruby Msg2Ves.rb
+    $ ruby Messenger.rb
+    $ ruby aisSentenceServer.rb
+
+You should now be able to access the web interface from http://localhost:3000.
