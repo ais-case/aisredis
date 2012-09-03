@@ -103,6 +103,7 @@ echo "done."
 # Now install rvmrc
 cd ${BASEPATH} && cd ..
 cp ${BASEPATH}/.rvmrc.distrib ${BASEPATH}/.rvmrc
+echo '[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"' >> ~/.bashrc
 
 echo
 echo "Done with installation"
