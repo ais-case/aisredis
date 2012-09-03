@@ -1,6 +1,6 @@
 = Getting started
 
-The main dependencies are Ruby 1.9.x, the ZeroMQ library and the bundler gem. Once the bundler gem
+The main dependencies are Ruby 1.8.x, the ZeroMQ library and the bundler gem. Once the bundler gem
 is installed, bundler can be used to install the remaining dependencies using
 the Gemfile in the root directory of the project. You may want to install and
 use a RVM gemset. This keeps to the installed gems separated from other gems
