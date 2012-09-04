@@ -31,7 +31,7 @@ rm -rf ~/.rvm/src/yaml* 2>&1
 echo "done."
 
 echo -n "Installing ruby ${MY_RUBY_VERSION}, this may take a while... "
-rvm install ${MY_RUBY_VERSION} --with-openssl-dir=${HOME}/.rvm/usr  1>>${LOG} 2>&1
+rvm install ${MY_RUBY_VERSION} -C --with-openssl-dir=${HOME}/.rvm/usr  1>>${LOG} 2>&1
 rm -rf ~/.rvm/src/ruby-${MY_RUBY_VERSION} 2>&1
 rvm use ${MY_RUBY_VERSION} 1>>${LOG} 2>&1
 echo "done."
