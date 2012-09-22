@@ -1,25 +1,31 @@
-# service
-# publish ais messages on redis.publish
-# messages are fetched from the zmq server 
+# ais sentence server
 
 require 'rubygems'
+require 'json'
+require 'net/http'
 require 'redis'
 
 $LOAD_PATH << './lib'
-require 'ZmqService.rb'
-require 'aisDomainClasses.rb'
 require 'aisDomainFactories.rb'
 
-# subscribe to zmq ais message server
-sub = ZmqSub.new('tcp://82.210.120.176:21000','')
-red = Redis.new
-
+uri = URI('http://82.210.120.176:21000/SUBSCRIBE/ais.sentence')
+redis = Redis.new
 sentenceFactory = AisDomainFactories::AisSentenceFactory.new
-loop {
-  
-  # publish the each ais message on redis
-  raw = sub.gets
-  sentence = sentenceFactory.load(raw)
-  red.publish(sentence.key, sentence.dump())
 
-}
+Net::HTTP.start(uri.host, uri.port) do |http|
+  request = Net::HTTP::Get.new uri.request_uri
+
+  http.request request do |response|
+    response.read_body do |chunk|
+      json = JSON::parse(chunk)
+      json.each_value do |array|
+        if array[0] == 'message'
+          raw = array[2]
+          sentence = sentenceFactory.load(raw)
+          redis.publish(sentence.key, sentence.dump())
+        end
+      end
+    end
+  end
+end
+
